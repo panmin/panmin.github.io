@@ -45,3 +45,8 @@ tomcat解压文件的bin文件夹中有**startup.sh**是用来**启动**服务�
 
 * 防火墙需要放开8080端口
 * 开机启动的实现
+* [tomcat启动速度慢原因](http://www.tuicool.com/articles/uaiURzF)：
+	tomcat生成sessionId时间过长，解决方法：
+	* 通过修改Tomcat启动文件 -Djava.security.egd=file:/dev/urandom
+	* 通过修改JRE中的java.security文件 securerandom.source=file:/dev/urandom
+* 自动部署脚本：思路是通过ssh复制war到服务器，然后停止tomcat,然后在启动tomcat
