@@ -27,9 +27,9 @@ Preferences→Browser Package打开安装nodejs插件的文件夹，
 
 **Nodejs.sublime-settings**文件修改：
 ```
-"node_command": "D:\\Program Files\\nodejs",
-"npm_command": "D:\\Program Files\\nodejs",
+"node_command": "D:\\Program Files\\nodejs\\node.exe",
+"npm_command": "D:\\Program Files\\nodejs\\npm.cmd",
 ```
 
-按`ctrl+b`就能执行node代码了
+按`alt+r`就能执行node代码了
  
