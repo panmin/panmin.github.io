@@ -12,7 +12,7 @@ tags:                                       #标签
 
 ## 
 
-![](../img/signature_versions.png)
+![]({site}/../img/signature_versions.png)
 
 打包一个文件的签名版本，
 

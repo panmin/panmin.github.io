@@ -1,6 +1,6 @@
 ---
 layout:     post                            # 使用的布局（不需要改）
-title:      Unsupported Modules Detected: Compilation is not supported for following modules              # 标题
+title:      Unsupported Modules Detected              # 标题
 subtitle:   点击Sync Project With Gradle Files就解决问题了   #副标题
 date:       2018-01-24                      # 时间
 author:     PanMin                              # 作者

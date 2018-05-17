@@ -24,9 +24,9 @@ const dp2px = dp=>PixelRatio.getPixelSizeForLayoutSize(dp);
 const px2dp = px=>PixelRatio.roundToNearestPixel(px);
 ```
 
-设计师给你一个尺寸，比如100px*200px的View，按照下面的方式可实现设计还原：
+设计师给你一个尺寸，比如100px*200px的View，按照下面的方式可实现设计还原：View 
 ```
-View style={{width:px2dp(100),height:px2dp(200),backgroundColor:"red"}}
+width:px2dp(100),height:px2dp(200),backgroundColor:"red"
 ```
 
 如果每个地方都这样写会很麻烦，于是我们就有了下面转换代码

@@ -1,6 +1,6 @@
 ---
 layout:     post                            # 使用的布局（不需要改）
-title:      Android Studio编译报错java.lang.OutOfMemoryError: GC overhead limit exceeded      # 标题
+title:      Android Studio编译报错GC overhead limit exceeded      # 标题
 subtitle:   内存不足，添加脚本指定编译堆内存大小         #副标题
 date:       2018-04-03                      # 时间
 author:     PanMin                              # 作者
