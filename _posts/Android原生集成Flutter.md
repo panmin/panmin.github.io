@@ -8,7 +8,7 @@
 
 ### 二、方案一：以Flutter为主工程，集成Android项目到Flutter中
 
-#### 2.1 实现步骤
+#### 实现步骤
 
 * 创建Flutter项目`flutter create flutter_native_app`
 
@@ -31,9 +31,152 @@
 
 ### 三、方案二：以Android项目为主工程，集成Flutter到Android项目中
 
-> 参考官方方案：https://flutter.dev/docs/development/add-to-app
+> 参考官方方案：https://flutter.dev/docs/development/add-to-app 官方当前版本为**1.12**，本文使用了**1.9**版本
 
+#### 3.1 在Android项目中创建Flutter Module
 
+创建Flutter Module有两种方式：
+
+* android studio中：`File --> New --> New Module --> Flutter Module   `
+* 通过命令创建：`flutter create -t module --org com.panmin flutter_module`
+
+#### 3.2 在Android项目根目录的`setting.gradle`添加脚本
+
+```groovy
+setBinding(new Binding([gradle: this]))
+evaluate(new File(
+        settingsDir,
+        'flutter_module/.android/include_flutter.groovy'
+))
+```
+
+#### 3.3 Android项目引用创建的flutter_module
+
+在app的项目`build.gradle`的`dependencies`中同样有两种方式添加引用：
+
+* 直接引用源码
+
+  ```groovy
+  implementation project(':flutter')
+  ```
+
+* 引用aar包
+
+  1. 先`cd flutter_module`，然后再`flutter pub get`，会生成`.android`和`.ios`项目
+
+  2. 执行`flutter build aar`，会生成release的aar，或者运行`flutter build aar --debug`生成debug的aar
+
+  3. 添加如下maven引用
+
+     ```groovy
+     repositories {
+         maven { url '../flutter_module/build/host/outputs/repo' }
+     }
+     dependencies {
+         debugImplementation 'com.panmin.flutter_module:flutter_debug:1.0@aar'
+         releaseImplementation 'com.panmin.flutter_module:flutter_release:1.0@aar'
+     }
+     ```
+
+#### 3.4 创建继承`Application`的类App，添加`FlutterMain.startInitialization(this)`
+
+```kotlin
+class App:Application() {
+    override fun onCreate() {
+        FlutterMain.startInitialization(this)
+        super.onCreate()
+    }
+}
+```
+
+在`AndroidManifest.xml`中添加`<application android:name=".App"`
+
+#### 3.5 实现跳转`FlutterActivity`
+
+```kotlin
+import io.flutter.app.FlutterActivity
+......
+startActivity(Intent(this, FlutterActivity::class.java))
+```
+
+*此处不使用`io.flutter.embedding.android.FlutterActivity` 而使用`io.flutter.app.FlutterActivity`*,**1.9**版本的flutter中的`io.flutter.embedding.android.FlutterActivity`还是处于试验阶段，这个和新版本的**1.12**不太一样，参考：https://github.com/flutter/flutter/wiki/Experimental:-Add-Flutter-Activity
+
+#### 3.6 原生如何跳转到对应的flutter页面
+
+* 继承`FlutterActivity`实现`MainFlutterActivity`
+
+  ```kotlin
+  class MainFlutterActivity : FlutterActivity() {
+      override fun onCreate(savedInstanceState: Bundle?) {
+          super.onCreate(savedInstanceState)
+          GeneratedPluginRegistrant.registerWith(this)
+      }
+  
+      override fun createFlutterView(context: Context?): FlutterView? {
+          val name = intent.getStringExtra("NAME") ?: return super.createFlutterView(context)
+          val view = FlutterView(this)
+          view.layoutParams = ViewGroup.LayoutParams(
+              ViewGroup.LayoutParams.MATCH_PARENT,
+              ViewGroup.LayoutParams.MATCH_PARENT
+          )
+          setContentView(view)
+          view.setInitialRoute(name)
+          return view
+      }
+  }
+  ```
+
+* `AndroidManifest.xml`中声明`MainFlutterActivity`
+
+  ```kotlin
+  <activity android:name=".MainFlutterActivity"/>
+  ```
+
+* flutter中实现
+
+  ```dart
+  class MyApp extends StatelessWidget {
+    @override
+    Widget build(BuildContext context) {
+      return MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: _widgetRouter(ui.window.defaultRouteName),
+      );
+    }
+  
+    _widgetRouter(String defaultRouteName) {
+      switch (defaultRouteName) {
+        case "/":
+          return MyHomePage(title: 'Flutter Demo Home Page');
+        case "/first":
+          return FirstPage();
+        case "/second":
+          return SecondPage();
+      }
+    }
+  }
+  ```
+
+* 原生的调用
+
+  ```kotlin
+  btn_first_flutter_page.setOnClickListener {
+    val intent = Intent(this, MainFlutterActivity::class.java)
+    intent.putExtra("NAME","/first")
+    startActivity(intent)
+  }
+  
+  btn_second_flutter_page.setOnClickListener {
+    val intent = Intent(this, MainFlutterActivity::class.java)
+    intent.putExtra("NAME","/second")
+    startActivity(intent)
+  }
+  ```
+
+  
 
 ### 四、两种方案对比
 
